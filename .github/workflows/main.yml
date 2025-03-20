@@ -2,10 +2,10 @@ name: Automated Daily Commits
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Commit 1: Midnight UTC
-    - cron: '0 8 * * *'  # Commit 2: 8 AM UTC
-    - cron: '0 16 * * *'  # Commit 3: 4 PM UTC
-  workflow_dispatch:  # Allows manual triggering
+    - cron: '0 0 * * *'   # Midnight UTC
+    - cron: '0 8 * * *'   # 8 AM UTC
+    - cron: '0 16 * * *'  # 4 PM UTC
+  workflow_dispatch:
 
 jobs:
   commit:
@@ -15,10 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # Uses GitHub's built-in token
-          persist-credentials: true  # Ensures credentials are available for pushing
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
-      - name: Configure Git with Personal Identity
+      - name: Configure Git
         run: |
           git config --global user.name "sharan-dev-ae"
           git config --global user.email "sharan-dev-ae@users.noreply.github.com"
@@ -26,9 +26,8 @@ jobs:
       - name: Pull latest changes
         run: git pull --rebase origin main || true
 
-      - name: Commit and Push Changes
+      - name: Update README.md to trigger commit
         run: |
-          echo "Hot fixes commit at $(date)" >> test_commit.txt
-          git add .
-          git commit -m "Hot fixes - $(date)" || echo "No changes to commit"
-          git push origin main
+          echo "Last update: $(date)" > last_update.txt
+          git add last_update.txt
+          git commit -m "Automated commit - $(date)" && git push origin main || echo "No changes to push"
